@@ -440,7 +440,7 @@ Ready to collaborate on exciting backend projects? Let's connect!
 
 - **Discord**: Join the `#ProDevProjectNexus` channel
 - **GitHub**: Check out my repositories and contribute to open-source projects
-- **Email**: simacoder@hotmail.coml
+- **Email**: simacoder@hotmail.com
 - **LinkedIn**: [Simanga Mchunu](https://www.linkedin.com/in/simanga-mchunu-7570078a/)
 
 ---
