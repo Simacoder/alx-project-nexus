@@ -165,6 +165,64 @@ The ProDev Backend Engineering program focuses on developing expertise in:
 - **Technical Discussions**: Regular architecture reviews and best practice sharing
 
 ---
+```bash
+    alx-project-nexus/
+    ├── ecommerce_backend/                 # Main project directory
+    │   ├── __init__.py
+    │   ├── settings.py
+    │   ├── urls.py
+    │   ├── wsgi.py
+    │   └── asgi.py
+    ├── app/                 # Single Django app
+    │   ├── __init__.py
+    │   ├── admin.py
+    │   ├── apps.py
+    │   ├── models.py             # All models (User, Product, Category)
+    │   ├── views.py              # All API views
+    │   ├── serializers.py        # All serializers
+    │   ├── urls.py               # All API URLs
+    │   ├── permissions.py        # Custom permissions
+    │   ├── utils.py              # Helper functions
+    │   ├── migrations/
+    │   └── tests.py
+    ├── static/
+    ├── media/
+    ├── templates/
+    ├── requirements.txt
+    ├── manage.py
+    ├── .env
+    ├── .env.example
+    ├── .gitignore
+    └── README.md
+```
+---
+
+## Local Development Setup
+
+1. Clone the repository
+2. Create virtual environment: `python -m venv venv`
+3. Activate virtual environment: `source venv/bin/activate` (Linux/Mac) or `venv\Scripts\activate` (Windows)
+4. Install requirements: `pip install -r requirements.txt`
+5. Copy `.env.example` to `.env` and update values
+6. Set up PostgreSQL database
+7. Run migrations: `python manage.py migrate`
+8. Create superuser: `python manage.py createsuperuser`
+9. Run server: `python manage.py runserver`
+
+## API Documentation
+
+- Swagger UI: http://localhost:8000/swagger/
+- ReDoc: http://localhost:8000/redoc/
+
+## Technologies Used
+
+- Django 4.2.7
+- Django REST Framework
+- PostgreSQL
+- JWT Authentication
+- Swagger/OpenAPI Documentation
+
+---
 
 ## 📈 Future Learning Goals
 
