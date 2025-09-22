@@ -224,6 +224,186 @@ The ProDev Backend Engineering program focuses on developing expertise in:
 
 ---
 
+
+
+# API Endpoints Design Overview
+
+## Base URL Structure
+```
+Development: http://127.0.0.1:8000/api/
+Production:  https://yourdomain.com/api/
+```
+
+## Authentication Endpoints
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/register/` | User registration | No |
+| POST | `/auth/login/` | User login | No |
+| POST | `/auth/logout/` | User logout | Yes |
+| POST | `/auth/refresh/` | Refresh JWT token | Yes |
+| GET | `/auth/profile/` | Get user profile | Yes |
+| PUT | `/auth/profile/` | Update user profile | Yes |
+
+## User Management Endpoints
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/users/` | List all users (admin only) | Yes |
+| GET | `/users/{id}/` | Get specific user | Yes |
+| PUT | `/users/{id}/` | Update user | Yes (own profile) |
+| DELETE | `/users/{id}/` | Delete user | Yes (admin) |
+
+## Category Endpoints
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/categories/` | List all categories | No |
+| POST | `/categories/` | Create category | Yes (seller/admin) |
+| GET | `/categories/{id}/` | Get category details | No |
+| PUT | `/categories/{id}/` | Update category | Yes (seller/admin) |
+| DELETE | `/categories/{id}/` | Delete category | Yes (admin) |
+| GET | `/categories/{id}/products/` | Get products in category | No |
+
+## Product Endpoints
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/products/` | List all products | No |
+| POST | `/products/` | Create product | Yes (seller) |
+| GET | `/products/{id}/` | Get product details | No |
+| PUT | `/products/{id}/` | Update product | Yes (owner/admin) |
+| DELETE | `/products/{id}/` | Delete product | Yes (owner/admin) |
+| POST | `/products/{id}/images/` | Add product images | Yes (owner) |
+| GET | `/products/search/` | Search products | No |
+| GET | `/products/featured/` | Get featured products | No |
+
+## Filtering and Query Parameters
+
+### Product Filtering
+```
+/api/products/?category=electronics
+/api/products/?min_price=100&max_price=500
+/api/products/?search=smartphone
+/api/products/?seller=user123
+/api/products/?is_featured=true
+/api/products/?in_stock=true
+```
+
+### Sorting
+```
+/api/products/?ordering=price          # Ascending price
+/api/products/?ordering=-price         # Descending price
+/api/products/?ordering=created_at     # Newest first
+/api/products/?ordering=name           # Alphabetical
+```
+
+### Pagination
+```
+/api/products/?page=1&page_size=20
+```
+
+## Response Format Standards
+
+### Success Response (200, 201)
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "name": "Product Name",
+    "price": "99.99"
+  },
+  "message": "Operation successful"
+}
+```
+
+### List Response with Pagination
+```json
+{
+  "success": true,
+  "count": 150,
+  "next": "http://api.example.com/products/?page=2",
+  "previous": null,
+  "results": [
+    {
+      "id": "uuid",
+      "name": "Product 1"
+    }
+  ]
+}
+```
+
+### Error Response (400, 401, 403, 404, 500)
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid input data",
+    "details": {
+      "name": ["This field is required"],
+      "price": ["Ensure this value is greater than 0"]
+    }
+  }
+}
+```
+
+## Authentication Headers
+
+### JWT Token Usage
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+## HTTP Status Codes Used
+
+| Code | Description | Usage |
+|------|-------------|-------|
+| 200 | OK | Successful GET, PUT requests |
+| 201 | Created | Successful POST requests |
+| 204 | No Content | Successful DELETE requests |
+| 400 | Bad Request | Validation errors, malformed requests |
+| 401 | Unauthorized | Authentication required |
+| 403 | Forbidden | Permission denied |
+| 404 | Not Found | Resource doesn't exist |
+| 409 | Conflict | Duplicate resource |
+| 422 | Unprocessable Entity | Semantic validation errors |
+| 500 | Internal Server Error | Server-side errors |
+
+## API Versioning Strategy
+
+### URL Versioning (Current)
+```
+/api/v1/products/
+/api/v2/products/ (future)
+```
+
+### Header Versioning (Alternative)
+```http
+Accept: application/json; version=1.0
+```
+
+## Rate Limiting & Throttling (Future)
+
+```
+Anonymous users: 100 requests/hour
+Authenticated users: 1000 requests/hour
+Premium users: 5000 requests/hour
+```
+
+## Content Types Supported
+
+- `application/json` (primary)
+- `multipart/form-data` (file uploads)
+- `application/x-www-form-urlencoded` (forms)
+
+## CORS Configuration
+
+```
+Allowed Origins: localhost:3000, yourdomain.com
+Allowed Methods: GET, POST, PUT, DELETE, OPTIONS
+Allowed Headers: Authorization, Content-Type
+Max Age: 86400
+```
+---
+
 ## 📈 Future Learning Goals
 
 - **Microservices Architecture**: Designing and implementing distributed systems
