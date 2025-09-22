@@ -17,6 +17,14 @@ urlpatterns = [
     path('auth/login/', views.LoginView.as_view(), name='login'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('auth/profile/', views.ProfileView.as_view(), name='profile'),
+
+    # Categories
+    path('categories/', views.CategoryListView.as_view(), name='category-list'),
+    path('categories/<slug:slug>/', views.CategoryDetailView.as_view(), name='category-detail'),
+    
+    # Products
+    path('products/', views.ProductListView.as_view(), name='product-list'),
+    path('products/<slug:slug>/', views.ProductDetailView.as_view(), name='product-detail'),
 ]
 
 # We might use routers for ViewSets later

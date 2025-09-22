@@ -4,6 +4,7 @@ Serializers for authentication
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.password_validation import validate_password
+from .models import Category, Product
 
 User = get_user_model()
 
@@ -57,3 +58,44 @@ class LoginSerializer(serializers.Serializer):
                 return data
             raise serializers.ValidationError("Invalid credentials")
         raise serializers.ValidationError("Must provide username and password")
+    
+
+class CategorySerializer(serializers.ModelSerializer):
+    """Category serializer"""
+    product_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug', 'description', 'parent', 
+                 'is_active', 'product_count', 'created_at']
+        read_only_fields = ['slug', 'created_at']
+    
+    def get_product_count(self, obj):
+        return obj.products.filter(is_active=True).count()
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    """Product serializer"""
+    seller_name = serializers.CharField(source='seller.username', read_only=True)
+    categories = CategorySerializer(many=True, read_only=True)
+    category_ids = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True, required=False
+    )
+    
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'slug', 'sku', 'description', 'price', 
+                 'stock_quantity', 'seller', 'seller_name', 'categories', 
+                 'category_ids', 'is_active', 'is_featured', 'created_at']
+        read_only_fields = ['id', 'slug', 'sku', 'seller', 'created_at']
+    
+    def create(self, validated_data):
+        category_ids = validated_data.pop('category_ids', [])
+        validated_data['seller'] = self.context['request'].user
+        product = Product.objects.create(**validated_data)
+        
+        if category_ids:
+            categories = Category.objects.filter(id__in=category_ids)
+            product.categories.set(categories)
+        
+        return product
