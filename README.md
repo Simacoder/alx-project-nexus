@@ -6,6 +6,9 @@ Welcome to **ALX Project Nexus** - a comprehensive documentation hub showcasing 
 
 The ProDev Backend Engineering program is an intensive, hands-on learning experience designed to transform aspiring developers into proficient backend engineers. Through practical projects, collaborative learning, and real-world problem-solving, participants gain the essential skills needed to build robust, scalable backend systems.
 
+# System Architecure E-commerce Backend
+
+![System architecture of E-commerce design](ALX_Project_Nexus_Architecture.png)
 ---
 
 ## 🎯 Program Learning Objectives
@@ -27,11 +30,15 @@ The ProDev Backend Engineering program focuses on developing expertise in:
 - **Django**: Full-featured web framework for rapid development and clean, pragmatic design
 - **Django REST Framework**: Building powerful and flexible APIs with authentication and serialization
 
+![Tech Stack](Tech%20stack%20structure.png)
+
 ### API Development
 - **REST APIs**: Designing and implementing RESTful services with proper HTTP methods and status codes
 - **GraphQL**: Query language for APIs enabling flexible data fetching and real-time subscriptions
 - **API Authentication**: JWT tokens, OAuth2, and session-based authentication mechanisms
 - **API Documentation**: Using tools like Swagger/OpenAPI for comprehensive API documentation
+
+![API Structure](api%20structure%20correct.png)
 
 ### DevOps & Infrastructure
 - **Docker**: Containerization for consistent development and deployment environments
@@ -45,6 +52,7 @@ The ProDev Backend Engineering program focuses on developing expertise in:
 - **Database Migrations**: Version control for database schema changes
 - **Query Optimization**: Performance tuning and efficient database queries
 
+![Database ERD](Database%20erd.png)
 ---
 
 ## 🧠 Important Backend Development Concepts
