@@ -1,23 +1,22 @@
 """
 API Views for ALX Project Nexus
 """
-from rest_framework import generics, status
+from rest_framework import generics, status, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
-from .models import Category, Product
 
 from .serializers import (
     UserSerializer, RegisterSerializer, LoginSerializer,
-    CategorySerializer, ProductSerializer  
+    CategorySerializer, ProductSerializer
 )
-from .models import Category, Product  
+from .models import Category, Product
+from .filters import ProductFilter, CategoryFilter
 
 User = get_user_model()
 
@@ -44,14 +43,23 @@ def api_root(request):
         "message": "ALX Project Nexus - E-Commerce API",
         "version": "1.0.0",
         "endpoints": {
-            "register": "/api/auth/register/",
-            "login": "/api/auth/login/",
-            "refresh": "/api/auth/refresh/",
-            "profile": "/api/auth/profile/",
+            "auth": {
+                "register": "/api/auth/register/",
+                "login": "/api/auth/login/",
+                "refresh": "/api/auth/refresh/",
+                "profile": "/api/auth/profile/",
+            },
+            "catalog": {
+                "categories": "/api/categories/",
+                "products": "/api/products/",
+                "search": "/api/products/?search=keyword",
+                "filter": "/api/products/?min_price=100&max_price=500",
+            }
         }
     })
 
 
+# Authentication views 
 class RegisterView(generics.CreateAPIView):
     """User registration"""
     queryset = User.objects.all()
@@ -63,7 +71,6 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
         
         return Response({
@@ -84,7 +91,6 @@ class LoginView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
         
         return Response({
@@ -104,18 +110,19 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+
+# Enhanced Category views
 class CategoryListView(generics.ListCreateAPIView):
-    """List and create categories"""
+    """List and create categories with filtering"""
     queryset = Category.objects.filter(is_active=True)
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]  # Only authenticated users can create
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = CategoryFilter
     search_fields = ['name', 'description']
     ordering_fields = ['name', 'created_at']
     ordering = ['name']
     
     def get_permissions(self):
-        """Allow anyone to view, but only authenticated users to create"""
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
@@ -125,53 +132,49 @@ class CategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Category detail, update, delete"""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
     lookup_field = 'slug'
     
     def get_permissions(self):
-        """Allow anyone to view, but only authenticated users to modify"""
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
 
 
+# Enhanced Product views
 class ProductListView(generics.ListCreateAPIView):
-    """List and create products"""
-    queryset = Product.objects.filter(is_active=True)
+    """List and create products with advanced filtering"""
+    queryset = Product.objects.filter(is_active=True).select_related('seller').prefetch_related('categories')
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['categories', 'seller', 'is_featured']
-    search_fields = ['name', 'description']
-    ordering_fields = ['name', 'price', 'created_at']
+    filterset_class = ProductFilter
+    search_fields = ['name', 'description', 'sku']
+    ordering_fields = ['name', 'price', 'created_at', 'view_count', 'stock_quantity']
     ordering = ['-created_at']
     
     def get_permissions(self):
-        """Allow anyone to view, but only sellers to create"""
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
     
     def perform_create(self, serializer):
-        """Ensure only sellers can create products"""
         if not self.request.user.is_seller:
-            raise serializers.ValidationError("Only sellers can create products")
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only sellers can create products")
         serializer.save()
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Product detail, update, delete"""
-    queryset = Product.objects.all()
+    queryset = Product.objects.select_related('seller').prefetch_related('categories')
     serializer_class = ProductSerializer
     lookup_field = 'slug'
     
     def get_permissions(self):
-        """Allow anyone to view, but only owner to modify"""
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
     
     def get_object(self):
-        """Increment view count when product is viewed"""
         obj = super().get_object()
         if self.request.method == 'GET':
             obj.increment_view_count()
