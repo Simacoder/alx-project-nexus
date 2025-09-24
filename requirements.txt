@@ -8,3 +8,4 @@ drf-yasg
 Pillow
 django-filter
 gunicorn
+whitenoise
