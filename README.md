@@ -6,9 +6,11 @@ Welcome to **ALX Project Nexus** - a comprehensive documentation hub showcasing 
 
 The ProDev Backend Engineering program is an intensive, hands-on learning experience designed to transform aspiring developers into proficient backend engineers. Through practical projects, collaborative learning, and real-world problem-solving, participants gain the essential skills needed to build robust, scalable backend systems.
 
-[API Documentation:](https://simanga5.pythonanywhere.com/swagger/) 
-[GitHub Repository:](https://github.com/Simacoder/alx-project-nexus) 
-[Live Demo:](https://simanga5.pythonanywhere.com/api/) 
+## Links
+
+- [API Documentation:](https://simanga5.pythonanywhere.com/swagger/) 
+- [GitHub Repository:](https://github.com/Simacoder/alx-project-nexus) 
+- [Live Demo:](https://simanga5.pythonanywhere.com/api/) 
 
 
 # System Architecure E-commerce Backend
