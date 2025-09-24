@@ -7,3 +7,4 @@ djangorestframework-simplejwt
 drf-yasg
 Pillow
 django-filter
+gunicorn
